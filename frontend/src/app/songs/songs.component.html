@@ -1,0 +1,82 @@
+<h2>Ajouter une chanson</h2>
+<form (ngSubmit)="addSong()">
+  <label>Titre :</label>
+  <input type="text" [(ngModel)]="newSong.title" name="title" required />
+  <br />
+
+  <label>Artiste :</label>
+  <input type="text" [(ngModel)]="newSong.artist" name="artist" />
+  <br />
+
+  <label>Genre :</label>
+  <input type="text" [(ngModel)]="newSong.genre" name="genre" />
+  <br />
+
+  <label>URL audio :</label>
+  <input type="text" [(ngModel)]="newSong.url" name="url" />
+  <br />
+
+  <label>Ou importer un fichier audio :</label>
+  <input type="file" accept="audio/*" (change)="handleFileUpload($event)" />
+  <br />
+
+  <button type="submit">Ajouter</button>
+</form>
+
+<hr />
+
+<h2>Liste des chansons</h2>
+
+<label>
+  <input type="checkbox" [(ngModel)]="showOnlyFavorites" name="filterFavorites" />
+  Afficher uniquement les favoris
+</label>
+
+<ul>
+  <li *ngFor="let song of filteredSongs()">
+    <strong>{{ song.title }}</strong> – {{ song.artist }} ({{ song.genre }})
+    <br />
+
+    <!-- Lecture / Pause -->
+    <button *ngIf="!audioService.isPlaying(song.url)" (click)="play(song.url)">▶️ Écouter</button>
+    <button *ngIf="audioService.isPlaying(song.url)" (click)="pause()">⏸️ Pause</button>
+
+    <!-- Favoris -->
+    <button (click)="toggleFavorite(song)">
+      {{ isFavorite(song) ? '💔 Retirer' : '❤️ Favori' }}
+    </button>
+
+    <!-- Ajout à playlist -->
+    <div>
+      <label>Ajouter à la playlist :</label>
+      <select (change)="onPlaylistSelect($event, song)">
+        <option value="">-- Sélectionner --</option>
+        <option *ngFor="let playlist of playlists" [value]="playlist._id">
+          {{ playlist.name }}
+        </option>
+      </select>
+    </div>
+  </li>
+</ul>
+
+<hr />
+
+<h2>Créer une playlist</h2>
+<form (ngSubmit)="createPlaylist()">
+  <input type="text" [(ngModel)]="newPlaylistName" name="playlistName" placeholder="Nom de la playlist" required />
+  <button type="submit">Créer</button>
+</form>
+
+<hr />
+
+<h2>Playlists existantes</h2>
+<ul>
+  <li *ngFor="let playlist of playlists">
+    <strong>{{ playlist.name }}</strong>
+    <ul>
+      <li *ngFor="let song of playlist.songs">
+        {{ song.title }} – {{ song.artist }}
+      </li>
+    </ul>
+  </li>
+</ul>
